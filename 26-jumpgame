@@ -1,0 +1,18 @@
+class Solution:
+    def canJump(self, nums: List[int]) -> bool:
+        current_max_reach = 0
+    
+        for i in range(len(nums)):
+            # If we are at an index that is beyond the current reachable index
+            if i > current_max_reach:
+                return False
+            
+            # Update the farthest index we can reach
+            current_max_reach = max(current_max_reach, i + nums[i])
+            
+            # If we can reach the last index, return True
+            if current_max_reach >= len(nums) - 1:
+                return True
+        
+        return False
+        
