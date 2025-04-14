@@ -1,0 +1,27 @@
+class Solution:
+    def canFinish(self, numCourses: int, prerequisites: List[List[int]]) -> bool:
+        graph = defaultdict(list)
+        in_degree = [0] * numCourses
+        
+        # Populate the graph and in-degree array
+        for dest, src in prerequisites:
+            graph[src].append(dest)
+            in_degree[dest] += 1
+        
+        # Queue for courses with no prerequisites
+        queue = deque([i for i in range(numCourses) if in_degree[i] == 0])
+        
+        # Count of courses that have been added to the queue (i.e., can be completed)
+        completed_courses = 0
+        
+        while queue:
+            course = queue.popleft()
+            completed_courses += 1
+            
+            for neighbor in graph[course]:
+                in_degree[neighbor] -= 1
+                # If in-degree becomes 0, it means all prerequisites are completed
+                if in_degree[neighbor] == 0:
+                    queue.append(neighbor)
+        
+        return completed_courses == numCourses
