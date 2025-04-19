@@ -1,0 +1,67 @@
+class Solution:
+    def maxStarSum(self, vals: List[int], edges: List[List[int]], k: int) -> int:
+        n = len(vals)
+        if n == 0:
+            return 0 # Or handle as per specific problem constraints for empty input
+
+        # 1. Build Adjacency List (storing neighbor indices)
+        adj = collections.defaultdict(list)
+        for u, v in edges:
+            adj[u].append(v)
+            adj[v].append(u)
+
+        # Initialize max_overall_sum to negative infinity to handle all negative vals
+        max_overall_sum = -math.inf
+
+        # 2. Iterate Through Potential Centers
+        for i in range(n):
+            # 3. Calculate Max Sum for Center i
+            current_center_val = vals[i]
+            current_star_sum = current_center_val
+
+            positive_neighbor_vals = []
+            if i in adj: # Check if the node actually has neighbors in the graph
+                for neighbor_index in adj[i]:
+                    # Consider only neighbors with positive values
+                    if vals[neighbor_index] > 0:
+                        positive_neighbor_vals.append(vals[neighbor_index])
+
+            # Sort positive neighbor values to pick the largest ones
+            positive_neighbor_vals.sort(reverse=True)
+
+            # Add the top k (or fewer if less available) positive neighbor values
+            num_neighbors_to_add = min(k, len(positive_neighbor_vals))
+            for j in range(num_neighbors_to_add):
+                current_star_sum += positive_neighbor_vals[j]
+
+            # 4. Track Overall Maximum
+            max_overall_sum = max(max_overall_sum, current_star_sum)
+
+        # If n > 0, max_overall_sum will hold a valid result.
+        # If n=0 (handled at the start), or if somehow max_overall_sum remained -inf
+        # (e.g., vals was [-inf]), we might need specific handling, but
+        # standard integer inputs make this robust.
+        # Check if vals itself was empty and adjust if needed based on constraints.
+        if n > 0 and max_overall_sum == -math.inf:
+            # This case happens if vals contains only -inf, or n=1 and vals[0] = -inf.
+            # If standard ints are used, this indicates all vals were negative,
+            # and the max was found correctly. But if vals could be empty, handle it.
+            # We already handled n=0 case.
+            # If n=1, max_overall_sum gets initialized correctly even if negative.
+            # So, the -inf check might be redundant with standard ints.
+            # Let's assume standard integer ranges. If vals is empty, n=0 check handles it.
+            # If vals has values, the loop finds the max single node value at minimum.
+            pass
+
+
+        # Check if the graph was disconnected and no nodes were processed properly
+        # (This shouldn't happen if n > 0)
+        # The initialization handles the case where all node values are negative.
+        if n == 0:
+            return 0 # Return 0 for an empty graph
+        else:
+            # Ensure we return at least the max single node value if all sums are negative
+            # This is implicitly handled by the loop and initialization correctly.
+            # For example, if vals = [-5], k=0, result is -5.
+            # If vals = [-1, -2], k=1, result is -1.
+            return max_overall_sum
